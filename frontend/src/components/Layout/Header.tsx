@@ -11,7 +11,8 @@ interface HeaderProps {
 export default function Header({ onMobileMenuClick, sidebarOpen }: HeaderProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
+  const displayUser = user?.name || user?.email || '';
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -25,11 +26,9 @@ export default function Header({ onMobileMenuClick, sidebarOpen }: HeaderProps) 
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
   
-  // Format the path to a readable title
   const getPageTitle = () => {
     const path = location.pathname.substring(1);
     if (!path || path === 'dashboard') return 'Dashboard';
-    
     return path
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -87,15 +86,15 @@ export default function Header({ onMobileMenuClick, sidebarOpen }: HeaderProps) 
             className="flex bg-[#0a1a10] text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#050c08] focus:ring-green-500 border border-green-500/30"
           >
             <span className="sr-only">Open user menu</span>
-            <div className="h-8 w-8 rounded-full flex items-center justify-center bg-gradient-to-br from-green-400 to-green-600 text-white font-bold">
-              {user?.avatar || 'AI'}
+            <div className="h-8 w-8 rounded-full flex items-center justify-center bg-gradient-to-br from-green-400 to-green-600 text-white font-bold text-xs">
+              {isLoading ? '...' : (user?.avatar || (displayUser ? displayUser.substring(0, 2).toUpperCase() : 'AG'))}
             </div>
           </button>
 
           {showDropdown && (
             <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-xl shadow-lg py-1 bg-[#0a1a10] border border-green-900/50 ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
               <div className="px-4 py-2 border-b border-green-900/30">
-                <p className="text-sm font-medium text-white truncate">{user?.name}</p>
+                <p className="text-sm font-medium text-white truncate">{displayUser}</p>
                 <p className="text-xs text-green-400/80 truncate">{user?.email}</p>
               </div>
               <button 
