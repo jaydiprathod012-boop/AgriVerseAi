@@ -26,6 +26,7 @@ import {
   FileText
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const yieldData = [
   { month: 'Jan', wheat: 20, rice: 0 },
@@ -43,7 +44,15 @@ const tips = [
 ];
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
+
+  const displayName = user?.name || user?.email || 'Farmer';
+  const displayLocation = user?.district && user?.state
+    ? `${user.district}, ${user.state}`
+    : user?.village || 'India';
+  const displayLand = user?.landArea ? `${user.landArea} acres` : '—';
+  const displayCrop = user?.cropType || 'Mixed';
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -63,12 +72,12 @@ export default function Dashboard() {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl md:text-5xl font-bold mb-3 flex items-center gap-3 bg-clip-text text-transparent bg-gradient-to-r from-green-300 to-lime-300">
-              <span className="text-4xl">🌾</span> नमस्ते, Rajesh Kumar!
+              <span className="text-4xl">🌾</span> नमस्ते, {displayName}!
             </h1>
             <p className="text-green-300/80 text-lg flex items-center gap-2">
-              Rabi Season 2025-26 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> 
-              आज: 19 जुलाई 2026 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> 
-              Pune, Maharashtra
+              {displayCrop} Season <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+              {new Date().toLocaleDateString('hi-IN', { day: 'numeric', month: 'long', year: 'numeric' })} <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+              {displayLocation}
             </p>
           </div>
           <div className="flex items-center gap-3 bg-[#0a1a11] px-5 py-3 rounded-full border border-green-800/40 backdrop-blur-sm">
@@ -98,7 +107,7 @@ export default function Dashboard() {
       {/* 2. StatCards Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         {[
-          { label: "Total Land", value: "12.5 acres", icon: <MapIcon size={20}/>, color: "text-green-400", bg: "bg-green-400/10" },
+          { label: "Total Land", value: displayLand, icon: <MapIcon size={20}/>, color: "text-green-400", bg: "bg-green-400/10" },
           { label: "Expected Yield", value: "48.2 qtl", icon: <TrendingUp size={20}/>, color: "text-lime-400", bg: "bg-lime-400/10" },
           { label: "Crop Health", value: "87%", icon: <Activity size={20}/>, color: "text-green-500", bg: "bg-green-500/10" },
           { label: "Active Alerts", value: "3", icon: <AlertTriangle size={20}/>, color: "text-amber-400", bg: "bg-amber-400/10", alert: true },
@@ -165,7 +174,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <h3 className="text-4xl font-bold flex items-center gap-2">32°C <span className="text-xl font-normal text-blue-200">Partly Cloudy</span></h3>
-                <p className="text-blue-300/80 mt-1 flex items-center gap-1"><MapIcon size={14}/> Pune, Maharashtra</p>
+                <p className="text-blue-300/80 mt-1 flex items-center gap-1"><MapIcon size={14}/> {displayLocation}</p>
               </div>
             </div>
             <div className="flex flex-wrap gap-4 justify-center md:justify-end text-sm text-blue-100/80">
