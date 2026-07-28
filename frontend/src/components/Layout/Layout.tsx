@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import Footer from './Footer';
@@ -7,10 +7,12 @@ import Footer from './Footer';
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  const showFooter = location.pathname === '/dashboard';
 
   return (
     <div className="flex h-screen bg-[#050c08] overflow-hidden">
-      {/* Mobile overlay */}
       {mobileSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/60 z-20 lg:hidden"
@@ -18,7 +20,6 @@ export default function Layout() {
         />
       )}
       
-      {/* Sidebar */}
       <Sidebar
         isOpen={sidebarOpen}
         mobileOpen={mobileSidebarOpen}
@@ -26,7 +27,6 @@ export default function Layout() {
         onToggle={() => setSidebarOpen(!sidebarOpen)}
       />
       
-      {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header
           onMobileMenuClick={() => setMobileSidebarOpen(true)}
@@ -38,7 +38,7 @@ export default function Layout() {
               <Outlet />
             </div>
           </div>
-          <Footer />
+          {showFooter && <Footer />}
         </main>
       </div>
     </div>
