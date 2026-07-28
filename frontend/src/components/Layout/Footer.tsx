@@ -1,82 +1,119 @@
-import { Instagram, Linkedin, Mail, Heart, Code2 } from 'lucide-react';
-
-const socialLinks = [
-  {
-    icon: Instagram,
-    label: 'Instagram',
-    href: 'https://www.instagram.com/im_jayy_100/?hl=en',
-    color: 'hover:text-pink-400 hover:border-pink-400/50 hover:bg-pink-400/10',
-    iconColor: 'text-pink-400',
-  },
-  {
-    icon: Linkedin,
-    label: 'LinkedIn',
-    href: 'https://www.linkedin.com/in/jaydiptech2005/',
-    color: 'hover:text-blue-400 hover:border-blue-400/50 hover:bg-blue-400/10',
-    iconColor: 'text-blue-400',
-  },
-  {
-    icon: Mail,
-    label: 'Email',
-    href: 'jaydiprathod012@gmail.com',
-    color: 'hover:text-green-400 hover:border-green-400/50 hover:bg-green-400/10',
-    iconColor: 'text-green-400',
-  },
-];
+import { Link } from 'react-router-dom';
+import { Leaf, Mail, Phone, MapPin, Instagram, Linkedin } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="relative mt-auto border-t border-green-900/30 bg-gradient-to-r from-[#071510] via-[#0a1a10] to-[#071510] overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-t from-green-900/5 to-transparent pointer-events-none" />
+    <footer className="border-t border-green-900/30 bg-gradient-to-b from-[#0a1a10] to-[#071510] text-green-100/70">
+      
+      {/* Main Footer */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between sm:items-center">
-
-          {/* Left: Developer credit */}
-          <div className="flex flex-col items-center sm:items-start gap-1">
-            <div className="flex items-center gap-2 text-green-400/60 text-xs">
-              <Code2 size={12} />
-              <span className="uppercase tracking-widest font-medium">Designed &amp; Developed by</span>
+          {/* Column 1 — Brand */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                <Leaf size={18} className="text-green-400" />
+              </div>
+              <span className="text-white font-bold text-lg">
+                AgriVerse <span className="text-green-400">AI</span>
+              </span>
             </div>
-            <p className="text-white font-bold tracking-[0.15em] text-sm uppercase bg-gradient-to-r from-green-300 to-lime-300 bg-clip-text text-transparent">
-              Jaydip Rathod
+            <p className="text-sm text-green-100/50 leading-relaxed">
+              दिल से खेती — भारतीय किसानों का AI साथी। स्मार्ट फार्मिंग के लिए आपका विश्वसनीय डिजिटल साथी।
             </p>
-          </div>
-
-          {/* Center */}
-          <div className="hidden sm:flex items-center gap-1.5 text-green-900/60 text-xs">
-            <span>Made with</span>
-            <Heart size={12} className="text-red-500/70 fill-red-500/70" />
-            <span>for Indian farmers</span>
-          </div>
-
-          {/* Right: Social icons */}
-          <div className="flex items-center gap-2">
-            {socialLinks.map(({ icon: Icon, label, href, color, iconColor }) => (
+            {/* Social Icons */}
+            <div className="flex items-center gap-3 pt-1">
               <a
-                key={label}
-                href={href}
+                href="https://instagram.com/yourusername"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={label}
-                title={label}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-green-900/40 bg-green-900/10 text-gray-400 text-xs font-medium transition-all duration-300 ease-out hover:scale-105 hover:shadow-lg ${color}`}
+                className="w-8 h-8 rounded-full border border-green-900/50 bg-green-900/20 flex items-center justify-center text-pink-400 hover:bg-pink-400/20 hover:border-pink-400/40 hover:scale-110 transition-all duration-300"
               >
-                <Icon size={13} className={`transition-colors ${iconColor} opacity-80`} />
-                <span className="hidden sm:inline">{label}</span>
+                <Instagram size={14} />
               </a>
-            ))}
+              <a
+                href="https://linkedin.com/in/yourusername"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full border border-green-900/50 bg-green-900/20 flex items-center justify-center text-blue-400 hover:bg-blue-400/20 hover:border-blue-400/40 hover:scale-110 transition-all duration-300"
+              >
+                <Linkedin size={14} />
+              </a>
+              <a
+                href="mailto:your@email.com"
+                className="w-8 h-8 rounded-full border border-green-900/50 bg-green-900/20 flex items-center justify-center text-green-400 hover:bg-green-400/20 hover:border-green-400/40 hover:scale-110 transition-all duration-300"
+              >
+                <Mail size={14} />
+              </a>
+            </div>
+          </div>
+
+          {/* Column 2 — Quick Links */}
+          <div className="space-y-4">
+            <h3 className="text-white font-semibold text-sm uppercase tracking-widest">
+              Quick Links
+            </h3>
+            <ul className="space-y-2 text-sm">
+              {[
+                { label: 'Dashboard', to: '/dashboard' },
+                { label: 'Disease Detection', to: '/disease' },
+                { label: 'Weather Intelligence', to: '/weather' },
+                { label: 'Mandi Prices', to: '/mandi' },
+                { label: 'Yield Prediction', to: '/yield' },
+                { label: 'Government Schemes', to: '/schemes' },
+              ].map((link) => (
+                <li key={link.label}>
+                  <Link
+                    to={link.to}
+                    className="text-green-100/50 hover:text-green-300 hover:translate-x-1 transition-all duration-200 inline-flex items-center gap-1"
+                  >
+                    <span className="text-green-600">›</span> {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 3 — Contact */}
+          <div className="space-y-4">
+            <h3 className="text-white font-semibold text-sm uppercase tracking-widest">
+              Contact
+            </h3>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-start gap-3 text-green-100/50">
+                <Mail size={15} className="text-green-400 mt-0.5 flex-shrink-0" />
+                <span>support@agriverse.ai</span>
+              </li>
+              <li className="flex items-start gap-3 text-green-100/50">
+                <Phone size={15} className="text-green-400 mt-0.5 flex-shrink-0" />
+                <span>+91 8329910022</span>
+              </li>
+              <li className="flex items-start gap-3 text-green-100/50">
+                <MapPin size={15} className="text-green-400 mt-0.5 flex-shrink-0" />
+                <span>Maharashtra, India</span>
+              </li>
+            </ul>
           </div>
 
         </div>
+      </div>
 
-        {/* Bottom line */}
-        <div className="mt-4 pt-3 border-t border-green-900/20 text-center">
-          <p className="text-green-900/50 text-xs">
-            © {new Date().getFullYear()} AgriVerse AI · All rights reserved
+      {/* Bottom Bar */}
+      <div className="border-t border-green-900/20 bg-[#050c08]/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-green-900/60">
+          <p>© {new Date().getFullYear()} AgriVerse AI. All rights reserved.</p>
+          <p className="text-green-700/80">
+            Designed &amp; Developed by{' '}
+            <span className="text-green-400 font-semibold">Jaydip Rathod</span>
+            {' '}|{' '}
+            <a href="tel:+91xxxxxxxxxx" className="hover:text-green-300 transition-colors">
+              📞 +91 xxxxxxxxxx
+            </a>
           </p>
         </div>
       </div>
+
     </footer>
   );
 }
