@@ -14,86 +14,70 @@ router.post('/chat', async (req: Request, res: Response) => {
 
   if (!GEMINI_API_KEY) {
     return res.status(500).json({
-      error: 'API key missing',
-      response: 'Server configuration error. GEMINI_API_KEY not set.'
+      response: 'Server error: GEMINI_API_KEY not configured on Render.'
     });
   }
 
   const langInstruction =
-    language === 'Hindi'   ? 'हमेशा हिंदी में जवाब दो। सरल और स्पष्ट भाषा use करो।' :
-    language === 'Marathi' ? 'नेहमी मराठीत उत्तर द्या. सोपी भाषा वापरा.' :
-    'Always reply in English. Keep it simple and clear.';
+    language === 'Hindi'   ? 'हमेशा सरल हिंदी में जवाब दो। 2-3 वाक्य में।' :
+    language === 'Marathi' ? 'नेहमी सोप्या मराठीत उत्तर द्या. 2-3 वाक्यात.' :
+    'Always reply in simple English. 2-3 sentences max.';
 
   const systemPrompt = `You are AgriVerse AI — an expert Indian farming assistant.
 ${langInstruction}
-Help farmers with: crop diseases, weather advice, mandi prices, government schemes (PM-KISAN, PMFBY, KCC), fertilizers, seeds, irrigation.
-Keep answers practical and helpful. Use emojis where appropriate. Keep responses concise (2-4 sentences).`;
+Help with: crop diseases, weather, mandi prices, PM-KISAN, PMFBY, KCC schemes, fertilizers, seeds, irrigation.
+Be practical, helpful, use emojis naturally.`;
 
   try {
     const contents: any[] = [];
 
     if (history && Array.isArray(history)) {
-      for (const msg of history) {
+      history.slice(-6).forEach((msg: any) => {
         if (msg.sender && msg.text) {
           contents.push({
             role: msg.sender === 'user' ? 'user' : 'model',
             parts: [{ text: msg.text }]
           });
         }
-      }
+      });
     }
 
-    contents.push({
-      role: 'user',
-      parts: [{ text: message }]
-    });
+    contents.push({ role: 'user', parts: [{ text: message }] });
 
     const geminiRes = await axios.post(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
-        system_instruction: {
-          parts: [{ text: systemPrompt }]
-        },
+        system_instruction: { parts: [{ text: systemPrompt }] },
         contents,
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 400,
-        }
+        generationConfig: { temperature: 0.7, maxOutputTokens: 400 }
       },
       { timeout: 15000 }
     );
 
     const aiText =
       geminiRes.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      'माफ करें, अभी जवाब नहीं दे पा रहा। कृपया दोबारा कोशिश करें। 🙏';
+      'माफ करें, जवाब नहीं मिला। दोबारा try करें। 🙏';
 
-    return res.json({
-      response: aiText,
-      language: language || 'Hindi'
-    });
+    return res.json({ response: aiText, language });
 
   } catch (error: any) {
     console.error('Gemini Error:', error?.response?.data || error.message);
-
     const fallback =
-      language === 'Hindi'   ? 'माफ करें, AI अभी उपलब्ध नहीं है। थोड़ी देर बाद कोशिश करें। 🙏' :
-      language === 'Marathi' ? 'माफ करा, AI सध्या उपलब्ध नाही. थोड्या वेळाने प्रयत्न करा. 🙏' :
-      'Sorry, AI is not available right now. Please try again later. 🙏';
-
+      language === 'Hindi'   ? 'माफ करें, AI अभी उपलब्ध नहीं है। थोड़ी देर बाद try करें। 🙏' :
+      language === 'Marathi' ? 'माफ करा, AI सध्या उपलब्ध नाही. 🙏' :
+      'Sorry, AI is unavailable right now. Try again later. 🙏';
     return res.status(500).json({ response: fallback });
   }
 });
 
 router.get('/suggestions/:language', (req: Request, res: Response) => {
   const lang = req.params.language;
-
-  const suggestions: Record<string, string[]> = {
-    Hindi:   ['आज का मौसम', 'फसल की बीमारी', 'मंडी भाव', 'सरकारी योजना', 'खाद की जानकारी', 'बीज की सलाह'],
-    Marathi: ['आजचे हवामान', 'पीक रोग', 'बाजारभाव', 'सरकारी योजना', 'खत माहिती', 'बियाणे सल्ला'],
-    English: ["Today's weather", 'Crop disease', 'Mandi prices', 'Govt schemes', 'Fertilizer info', 'Seed advice'],
+  const map: Record<string, string[]> = {
+    Hindi:   ['आज का मौसम', 'फसल की बीमारी', 'मंडी भाव', 'PM-KISAN योजना', 'खाद की जानकारी', 'बीज की सलाह'],
+    Marathi: ['आजचे हवामान', 'पीक रोग', 'बाजारभाव', 'PM-KISAN योजना', 'खत माहिती', 'बियाणे सल्ला'],
+    English: ["Today's weather", 'Crop disease help', 'Mandi prices', 'PM-KISAN scheme', 'Fertilizer advice', 'Seed guidance'],
   };
-
-  return res.json(suggestions[lang] || suggestions['Hindi']);
+  return res.json(map[lang] || map['Hindi']);
 });
 
 export default router;
