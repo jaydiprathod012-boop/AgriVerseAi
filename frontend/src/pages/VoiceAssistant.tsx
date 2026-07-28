@@ -30,58 +30,57 @@ const WELCOME: Record<string, string> = {
   English: 'Hello! I am AgriVerse AI 🌾 Ask me anything about farming — diseases, weather, mandi prices, government schemes. Press the mic button to talk!',
 };
 
-// ✅ Direct Gemini API call — no backend needed
-const callGemini = async (message: string, language: string, history: Message[]): Promise<string> => {
-  const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+// ✅ Groq API — Free, Fast, No backend needed
+const callAI = async (message: string, language: string, history: Message[]): Promise<string> => {
+  const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
   if (!API_KEY) {
-    throw new Error('VITE_GEMINI_API_KEY not set in Vercel environment variables');
+    throw new Error('VITE_GROQ_API_KEY not set in Vercel environment variables');
   }
 
   const langInstruction =
-    language === 'Hindi'   ? 'हमेशा सरल हिंदी में जवाब दो। 2-3 वाक्य में।' :
-    language === 'Marathi' ? 'नेहमी सोप्या मराठीत उत्तर द्या. 2-3 वाक्यात.' :
-    'Always reply in simple English. 2-3 sentences max.';
+    language === 'Hindi'   ? 'हमेशा सरल हिंदी में जवाब दो। 2-3 वाक्य में जवाब दो।' :
+    language === 'Marathi' ? 'नेहमी सोप्या मराठीत उत्तर द्या. 2-3 वाक्यात उत्तर द्या.' :
+    'Always reply in simple English. Keep it to 2-3 sentences.';
 
   const systemPrompt = `You are AgriVerse AI — an expert Indian farming assistant.
 ${langInstruction}
-Help with: crop diseases, weather, mandi prices, PM-KISAN, PMFBY, KCC schemes, fertilizers, seeds, irrigation.
-Be practical and helpful. Use emojis naturally.`;
+Help farmers with: crop diseases, weather advice, mandi prices, government schemes (PM-KISAN, PMFBY, KCC), fertilizers, seeds, irrigation.
+Be practical, simple, and helpful. Use relevant emojis naturally.`;
 
-  const contents: any[] = [];
+  const chatHistory = history.slice(-6).map(msg => ({
+    role: msg.sender === 'user' ? 'user' : 'assistant',
+    content: msg.text
+  }));
 
-  history.slice(-6).forEach(msg => {
-    if (msg.sender && msg.text) {
-      contents.push({
-        role: msg.sender === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.text }]
-      });
-    }
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...chatHistory,
+        { role: 'user', content: message }
+      ],
+      temperature: 0.7,
+      max_tokens: 400
+    })
   });
-
-  contents.push({ role: 'user', parts: [{ text: message }] });
-
-  const res = await fetch(
-  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents,
-        generationConfig: { temperature: 0.7, maxOutputTokens: 400 }
-      })
-    }
-  );
 
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err?.error?.message || 'Gemini API error');
+    throw new Error(err?.error?.message || 'Groq API error');
   }
 
   const data = await res.json();
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-    (language === 'Hindi' ? 'माफ करें, जवाब नहीं मिला। दोबारा try करें। 🙏' : 'Sorry, no response. Please try again. 🙏');
+  return data?.choices?.[0]?.message?.content ||
+    (language === 'Hindi' ? 'माफ करें, जवाब नहीं मिला। दोबारा try करें। 🙏' :
+     language === 'Marathi' ? 'माफ करा, उत्तर मिळाले नाही. पुन्हा प्रयत्न करा. 🙏' :
+     'Sorry, no response received. Please try again. 🙏');
 };
 
 export default function VoiceAssistant() {
@@ -148,7 +147,7 @@ export default function VoiceAssistant() {
     setQCount(p => p + 1);
 
     try {
-      const aiText = await callGemini(text.trim(), activeLang, messages);
+      const aiText = await callAI(text.trim(), activeLang, messages);
       const aiMsg: Message = {
         id: (Date.now() + 1).toString(), sender: 'ai', text: aiText,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -158,8 +157,8 @@ export default function VoiceAssistant() {
       speak(aiText);
     } catch (err: any) {
       const errMsg =
-        err.message?.includes('API_KEY_INVALID') ? '❌ API Key invalid है। Vercel pe VITE_GEMINI_API_KEY check karo।' :
-        err.message?.includes('VITE_GEMINI_API_KEY') ? '❌ VITE_GEMINI_API_KEY Vercel pe set nahi hai।' :
+        err.message?.includes('VITE_GROQ_API_KEY') ? '❌ VITE_GROQ_API_KEY Vercel pe set nahi hai। Settings → Env Variables mein add karo।' :
+        err.message?.includes('Invalid API Key')    ? '❌ Groq API Key invalid hai। console.groq.com se nayi key banao।' :
         `❌ Error: ${err.message || 'Unknown error'}`;
       setError(errMsg);
       setMessages(prev => [...prev, {
@@ -221,7 +220,7 @@ export default function VoiceAssistant() {
             </div>
             <div>
               <h1 className="text-xl font-bold">AI Kisan Assistant</h1>
-              <p className="text-xs text-green-400/60">Powered by Google Gemini ✨</p>
+              <p className="text-xs text-green-400/60">Powered by Groq ⚡ Llama 3.3</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -297,7 +296,7 @@ export default function VoiceAssistant() {
                 <button onClick={stopSpeaking}
                   className="flex items-center gap-2 px-4 py-1.5 bg-green-900/30 border border-green-500/30 rounded-full text-xs text-green-300 hover:bg-red-900/20 hover:text-red-300 transition-all">
                   <Volume2 className="w-3 h-3 animate-pulse" />
-                  {activeLang === 'Hindi' ? 'बोल रहा है... (रोकें)' : 'Speaking... (stop)'}
+                  {activeLang === 'Hindi' ? 'बोल रहा है... (रोकें)' : activeLang === 'Marathi' ? 'बोलतोय... (थांबवा)' : 'Speaking... (stop)'}
                 </button>
               </div>
             )}
@@ -329,7 +328,6 @@ export default function VoiceAssistant() {
 
         {/* Right Panel */}
         <div className="w-full lg:w-[360px] flex flex-col gap-5 shrink-0">
-          {/* Mic */}
           <div className="bg-[#0f2318] border border-green-900/30 rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden min-h-[280px]">
             {micState === 'listening' && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -354,7 +352,6 @@ export default function VoiceAssistant() {
             </div>
           </div>
 
-          {/* Suggestions */}
           <div className="bg-[#0f2318] border border-green-900/30 rounded-2xl p-4">
             <h3 className="text-xs font-semibold text-green-400/70 uppercase tracking-wider mb-3">
               {activeLang === 'Hindi' ? '⚡ जल्दी पूछें' : activeLang === 'Marathi' ? '⚡ झटपट विचारा' : '⚡ Quick Questions'}
@@ -369,7 +366,6 @@ export default function VoiceAssistant() {
             </div>
           </div>
 
-          {/* Tips */}
           <div className="bg-[#0a1810] border border-green-900/20 rounded-2xl p-4">
             <h3 className="text-xs font-semibold text-green-400/50 uppercase tracking-wider mb-2">💡 How to use</h3>
             <ul className="text-xs text-green-900/70 space-y-1.5">
@@ -387,7 +383,7 @@ export default function VoiceAssistant() {
           <span className="flex items-center gap-1"><Activity className="w-3 h-3 text-green-500" /> Asked: {qCount}</span>
           <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-amber-500" /> Answered: {aCount}</span>
           <span className="flex items-center gap-1"><Languages className="w-3 h-3 text-blue-500" /> {activeLang}</span>
-          <span className="flex items-center gap-1"><Settings2 className="w-3 h-3 text-purple-500" /> Gemini Flash</span>
+          <span className="flex items-center gap-1"><Settings2 className="w-3 h-3 text-purple-500" /> Groq ⚡ Llama 3.3</span>
         </div>
       </footer>
     </div>
