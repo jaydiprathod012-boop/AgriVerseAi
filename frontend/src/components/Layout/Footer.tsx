@@ -4,7 +4,124 @@ import { Leaf, Mail, Phone, MapPin, Instagram, Linkedin } from 'lucide-react';
 export default function Footer() {
   return (
     <footer className="border-t border-green-900/30 bg-gradient-to-b from-[#0a1a10] to-[#071510] text-green-100/70">
-      
+
+      {/* ✨ Neon Name CSS */}
+      <style>{`
+        @keyframes neonFlicker {
+          0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+            text-shadow:
+              0 0 4px #fff,
+              0 0 10px #fff,
+              0 0 20px #0fa,
+              0 0 40px #0fa,
+              0 0 80px #0fa,
+              0 0 90px #0fa,
+              0 0 100px #0fa,
+              0 0 150px #0fa;
+            color: #fff;
+          }
+          20%, 24%, 55% {
+            text-shadow: none;
+            color: #aaa;
+          }
+        }
+
+        @keyframes neonPulse {
+          0%, 100% {
+            text-shadow:
+              0 0 5px #fff,
+              0 0 10px #fff,
+              0 0 25px #ff00ff,
+              0 0 50px #ff00ff,
+              0 0 80px #ff00ff,
+              0 0 100px #ff00ff;
+            color: #ff88ff;
+          }
+          25% {
+            text-shadow:
+              0 0 5px #fff,
+              0 0 15px #fff,
+              0 0 30px #00ffff,
+              0 0 60px #00ffff,
+              0 0 90px #00ffff;
+            color: #88ffff;
+          }
+          50% {
+            text-shadow:
+              0 0 5px #fff,
+              0 0 15px #fff,
+              0 0 30px #0fa,
+              0 0 60px #0fa,
+              0 0 90px #0fa,
+              0 0 120px #0fa;
+            color: #88ffcc;
+          }
+          75% {
+            text-shadow:
+              0 0 5px #fff,
+              0 0 15px #fff,
+              0 0 30px #ff6600,
+              0 0 60px #ff6600,
+              0 0 90px #ff6600;
+            color: #ffaa66;
+          }
+        }
+
+        @keyframes float3d {
+          0%, 100% {
+            transform: translateY(0px) rotateX(0deg);
+          }
+          50% {
+            transform: translateY(-4px) rotateX(5deg);
+          }
+        }
+
+        @keyframes colorShift {
+          0%   { color: #ff00ff; }
+          20%  { color: #00ffff; }
+          40%  { color: #00ff88; }
+          60%  { color: #ffaa00; }
+          80%  { color: #ff4488; }
+          100% { color: #ff00ff; }
+        }
+
+        .neon-name {
+          animation: neonPulse 3s ease-in-out infinite, float3d 3s ease-in-out infinite;
+          font-weight: 900;
+          letter-spacing: 0.12em;
+          font-size: 0.9rem;
+          text-transform: uppercase;
+          display: inline-block;
+          perspective: 500px;
+          background: linear-gradient(90deg, #ff00ff, #00ffff, #00ff88, #ffaa00, #ff4488);
+          background-size: 300% 300%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          filter: brightness(1.4) drop-shadow(0 0 8px #0fa) drop-shadow(0 0 16px #ff00ff);
+        }
+
+        @keyframes bgShift {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        .neon-name {
+          animation: neonPulse 3s ease-in-out infinite, float3d 3s ease-in-out infinite, bgShift 4s ease infinite;
+        }
+
+        .neon-pipe {
+          color: #444;
+          margin: 0 6px;
+        }
+
+        .neon-label {
+          color: #6ee7b7;
+          font-size: 0.75rem;
+        }
+      `}</style>
+
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -25,7 +142,7 @@ export default function Footer() {
             {/* Social Icons */}
             <div className="flex items-center gap-3 pt-1">
               <a
-                href="https://instagram.com/yourusername"
+                href="https://www.instagram.com/im_jayy_100/?hl=en"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 rounded-full border border-green-900/50 bg-green-900/20 flex items-center justify-center text-pink-400 hover:bg-pink-400/20 hover:border-pink-400/40 hover:scale-110 transition-all duration-300"
@@ -33,7 +150,7 @@ export default function Footer() {
                 <Instagram size={14} />
               </a>
               <a
-                href="https://linkedin.com/in/yourusername"
+                href="https://www.linkedin.com/in/jaydiptech2005/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 rounded-full border border-green-900/50 bg-green-900/20 flex items-center justify-center text-blue-400 hover:bg-blue-400/20 hover:border-blue-400/40 hover:scale-110 transition-all duration-300"
@@ -41,7 +158,7 @@ export default function Footer() {
                 <Linkedin size={14} />
               </a>
               <a
-                href="mailto:your@email.com"
+                href="jaydiprathod012@gmail.com"
                 className="w-8 h-8 rounded-full border border-green-900/50 bg-green-900/20 flex items-center justify-center text-green-400 hover:bg-green-400/20 hover:border-green-400/40 hover:scale-110 transition-all duration-300"
               >
                 <Mail size={14} />
@@ -99,18 +216,28 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="border-t border-green-900/20 bg-[#050c08]/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-green-900/60">
-          <p>© {new Date().getFullYear()} AgriVerse AI. All rights reserved.</p>
-          <p className="text-green-700/80">
-            Designed &amp; Developed by{' '}
-            <span className="text-green-400 font-semibold">Jaydip Rathod</span>
-            {' '}|{' '}
-            <a href="tel:+91xxxxxxxxxx" className="hover:text-green-300 transition-colors">
+      {/* Bottom Bar with Neon Name */}
+      <div className="border-t border-green-900/20 bg-[#050c08]/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          
+          <p className="text-green-900/60">
+            © {new Date().getFullYear()} AgriVerse AI. All rights reserved.
+          </p>
+
+          {/* ✨ Neon Animated Name */}
+          <div className="flex items-center gap-1 flex-wrap justify-center">
+            <span className="neon-label">Designed &amp; Developed by</span>
+            <span className="neon-pipe">|</span>
+            <span className="neon-name">Jaydip Rathod</span>
+            <span className="neon-pipe">|</span>
+            <a
+              href="tel:+91xxxxxxxxxx"
+              className="text-green-700/70 hover:text-green-400 transition-colors"
+            >
               📞 +91 xxxxxxxxxx
             </a>
-          </p>
+          </div>
+
         </div>
       </div>
 
